@@ -163,7 +163,7 @@ const Fireworks = () => {
       requestAnimationFrame(animate);
     };
 
-    firecrackerAudio.current = new Audio('/firecracker.mp3');
+    firecrackerAudio.current = new Audio('/firecraker.mp3');
     firecrackerAudio.current.loop = true;
     firecrackerAudio.current.play().catch(() => console.error('Failed to play audio.'));
 
