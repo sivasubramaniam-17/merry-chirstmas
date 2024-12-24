@@ -118,7 +118,7 @@ const FireworksWithAudioAndLogo = () => {
 
     return () => {
       if (firecrackerAudio.current) {
-        firecrackerAudio.current.pause();
+        firecrackerAudio.current.play();
         firecrackerAudio.current = null;
       }
       window.removeEventListener('resize', resizeCanvas);
@@ -128,7 +128,7 @@ const FireworksWithAudioAndLogo = () => {
   const toggleAudio = () => {
     if (firecrackerAudio.current) {
       if (isPlaying) {
-        firecrackerAudio.current.pause();
+        firecrackerAudio.current.play();
       } else {
         firecrackerAudio.current.play();
       }
@@ -191,9 +191,9 @@ const FireworksWithAudioAndLogo = () => {
             alt="Santa Hat"
             sx={{
               position: 'absolute',
-              top: {xs:"-39%",md:'-21%'},
-              left:  {xs:"8%",md:'0%'},
-              width: { xs: '50px', sm: '70px', md: '100px' },
+              top: {xs:"-4%",md:'-21%'},
+              left:  {xs:"15%",md:'0%'},
+              width: { xs: '30px', sm: '70px', md: '100px' },
               transform: 'rotate(-15deg)',
             }}
           />
@@ -262,13 +262,15 @@ const FireworksWithAudioAndLogo = () => {
           position: 'absolute',
           bottom: 20,
           right: 20,
-          backgroundColor: 'rgba(255, 255, 255, 0.2)',
+          backgroundColor: 'rgba(255, 255, 255, 0)',
           borderRadius: '50%',
+          display:'none',
           minWidth: '48px',
           width: '48px',
           height: '48px',
+          
           '&:hover': {
-            backgroundColor: 'rgba(255, 255, 255, 0.3)',
+            backgroundColor: 'rgba(255, 255, 255, 0.0)',
           }
         }}
       >
