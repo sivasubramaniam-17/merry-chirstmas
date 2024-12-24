@@ -175,7 +175,7 @@ const Fireworks = () => {
     };
   }, []);
 
-  return <canvas ref={canvasRef} style={{ display: 'block', width: '100%', height: '100vh' }} />;
+  return <canvas ref={canvasRef} style={{ display: 'block', width: '100%', height: '100vh',padding:"0" }} />;
 };
 
 export default Fireworks;
