@@ -1,8 +1,11 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { Box, Typography, Button } from '@mui/material';
+import { Volume2, VolumeX } from 'lucide-react';
 
-const Fireworks = () => {
+const FireworksWithAudioAndLogo = () => {
   const canvasRef = useRef(null);
   const firecrackerAudio = useRef(null);
+  const [isPlaying, setIsPlaying] = useState(false);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -23,11 +26,6 @@ const Fireworks = () => {
     const fireworks = [];
     const fireworkColors = ['#ff5733', '#33ff57', '#5733ff', '#ffd700', '#ff33aa', '#ff00ff'];
 
-    const logo = new Image();
-    logo.src = '/logo.png';
-    const santaHat = new Image();
-    // santaHat.src = '/santa-hat.png';
-
     const generateSnowflakes = () => {
       if (Math.random() < 0.05) {
         snowflakes.push({
@@ -40,7 +38,7 @@ const Fireworks = () => {
     };
 
     const drawSnowflakes = () => {
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
       for (let i = snowflakes.length - 1; i >= 0; i--) {
         const s = snowflakes[i];
         ctx.beginPath();
@@ -91,64 +89,9 @@ const Fireworks = () => {
       ctx.globalAlpha = 1;
     };
 
-    let textOpacity = 0;
-    const animateText = () => {
-      textOpacity = Math.min(textOpacity + 0.01, 1);
-
-      const screenWidth = canvas.width / (window.devicePixelRatio || 1);
-      const centerX = screenWidth / 2;
-
-      // Draw "Merry Christmas!"
-      const christmasText = 'Merry Christmas!';
-      const baseFontSize = Math.min(screenWidth / 10, 70);  // Adjust baseFontSize for mobile screens
-      ctx.font = `${baseFontSize}px 'Dancing Script', cursive`;
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'alphabetic';
-
-      const christmasY = canvas.height / 3;
-      const christmasMetrics = ctx.measureText(christmasText);
-
-      ctx.fillStyle = `rgba(255, 223, 0, ${textOpacity})`;
-      ctx.fillText(christmasText, centerX, christmasY);
-
-      // Draw Santa Hat precisely on 'M'
-      if (textOpacity === 1 && santaHat.complete) {
-        const leftTextEdge = centerX - christmasMetrics.width / 2;
-        const hatWidth = baseFontSize * 0.7;
-        const hatHeight = hatWidth;
-        const hatX = leftTextEdge - hatWidth * 0.2;  // Adjust for better positioning
-        const hatY = christmasY - baseFontSize * 0.7;
-
-        ctx.drawImage(santaHat, hatX, hatY, hatWidth, hatHeight);
-      }
-
-      // Draw company name with exact center alignment
-      const companyText = 'Matt Engineering Solutions';
-      const subFontSize = Math.min(screenWidth / 25, 40); // Adjust subFontSize for better mobile display
-
-      ctx.font = `${subFontSize}px Arial`;
-      ctx.fillStyle = `rgba(255, 255, 255, ${textOpacity})`;
-      ctx.textBaseline = 'middle';
-
-      const companyY = canvas.height * 0.7;
-      const companyMetrics = ctx.measureText(companyText);
-
-      // Ensure exact center alignment for company name
-      const companyX = Math.round(centerX);
-      ctx.fillText(companyText, companyX, companyY);
-
-      // Draw Logo
-      if (logo.complete) {
-        const logoSize = subFontSize * 1.5;
-        const logoX = companyX - companyMetrics.width / 2 - logoSize - 10;
-        const logoY = companyY - logoSize / 2;
-        ctx.drawImage(logo, logoX, logoY, logoSize, logoSize);
-      }
-    };
-
     const animate = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.fillStyle = '#000000';
+      ctx.fillStyle = '#000';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       generateSnowflakes();
@@ -159,23 +102,180 @@ const Fireworks = () => {
         createFirework(Math.random() * canvas.width, Math.random() * canvas.height / 2);
       }
 
-      animateText();
       requestAnimationFrame(animate);
     };
 
-    firecrackerAudio.current = new Audio('/firecraker.mp3');
+    firecrackerAudio.current = new Audio('firecracker.mp3');
     firecrackerAudio.current.loop = true;
-    firecrackerAudio.current.play().catch(() => console.error('Failed to play audio.'));
+    firecrackerAudio.current.volume = 0.5;
+
+    // Try to play the audio automatically
+    firecrackerAudio.current.play().catch((err) => {
+      console.log("Audio play failed:", err);
+    });
 
     animate();
 
     return () => {
-      firecrackerAudio.current.pause();
+      if (firecrackerAudio.current) {
+        firecrackerAudio.current.pause();
+        firecrackerAudio.current = null;
+      }
       window.removeEventListener('resize', resizeCanvas);
     };
   }, []);
 
-  return <canvas ref={canvasRef} style={{ display: 'block', width: '100%', height: '100vh',padding:"0" }} />;
+  const toggleAudio = () => {
+    if (firecrackerAudio.current) {
+      if (isPlaying) {
+        firecrackerAudio.current.pause();
+      } else {
+        firecrackerAudio.current.play();
+      }
+      setIsPlaying(!isPlaying);
+    }
+  };
+
+  return (
+    <Box
+      sx={{
+        position: 'relative',
+        width: '100%',
+        height: '100vh',
+        backgroundColor: '#000',
+        overflow: 'hidden',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+    >
+      <canvas
+        ref={canvasRef}
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+        }}
+      />
+
+      <Box
+        sx={{
+          position: 'relative',
+          textAlign: 'center',
+          zIndex: 1,
+        }}
+      >
+        <Typography
+          variant="h1"
+          sx={{
+            fontFamily: 'Dancing Script, cursive',
+            fontSize: { xs: '2rem', sm: '4rem', md: '6rem' },
+            color: '#ffd700',
+            textShadow: '0px 0px 20px rgba(255, 223, 0, 0.8)',
+            mb: 2,
+            position: 'relative',
+            display: 'inline-block',
+            animation: 'textAnimation 3s ease-out',
+            '@keyframes textAnimation': {
+              from: { opacity: 0, transform: 'translateY(-20px)' },
+              to: { opacity: 1, transform: 'translateY(0)' }
+            }
+          }}
+        >
+          Merry Christmas!
+          <Box
+            component="img"
+            src="/santa-hat.png"
+            alt="Santa Hat"
+            sx={{
+              position: 'absolute',
+              top: {xs:"-39%",md:'-21%'},
+              left:  {xs:"8%",md:'0%'},
+              width: { xs: '50px', sm: '70px', md: '100px' },
+              transform: 'rotate(-15deg)',
+            }}
+          />
+        </Typography>
+
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 2,
+            mt: 2,
+          }}
+        >
+          <Box
+            component="img"
+            src="/logo.png"
+            alt="Logo"
+            sx={{
+              width: { xs: '40px', sm: '60px', md: '60px' },
+              height: 'auto',
+              animation: 'logoAnimation 5s ease-in-out infinite',
+              '@keyframes logoAnimation': {
+                '0%': { transform: 'scale(1)' },
+                '50%': { transform: 'scale(1.1)' },
+                '100%': { transform: 'scale(1)' }
+              }
+            }}
+          />
+
+          <Typography
+            variant="h6"
+            sx={{
+              fontFamily: 'Arial, sans-serif',
+              fontSize: { xs: '1rem', sm: '1.5rem', md: '2rem' },
+              color: '#fff',
+              textShadow: '0px 0px 10px rgba(255, 255, 255, 0.6)',
+            }}
+          >
+            Matt Engineering Solutions
+          </Typography>
+        </Box>
+
+        <Typography
+          variant="h6"
+          sx={{
+            fontFamily: 'Arial, sans-serif',
+            fontSize: { xs: '1rem', sm: '1.5rem', md: '2rem' },
+            color: '#fff',
+            mt: 2,
+            textShadow: '0px 0px 10px rgba(255, 255, 255, 0.6)',
+            animation: 'messageAnimation 3s ease-out',
+            '@keyframes messageAnimation': {
+              from: { opacity: 0, transform: 'translateY(20px)' },
+              to: { opacity: 1, transform: 'translateY(0)' }
+            }
+          }}
+        >
+          Wishing you peace, joy, and happiness this Christmas
+        </Typography>
+      </Box>
+
+      <Button
+        onClick={toggleAudio}
+        sx={{
+          position: 'absolute',
+          bottom: 20,
+          right: 20,
+          backgroundColor: 'rgba(255, 255, 255, 0.2)',
+          borderRadius: '50%',
+          minWidth: '48px',
+          width: '48px',
+          height: '48px',
+          '&:hover': {
+            backgroundColor: 'rgba(255, 255, 255, 0.3)',
+          }
+        }}
+      >
+        {isPlaying ? <Volume2 color="white" /> : <VolumeX color="white" />}
+      </Button>
+    </Box>
+  );
 };
 
-export default Fireworks;
+export default FireworksWithAudioAndLogo;
